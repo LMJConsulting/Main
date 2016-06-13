@@ -1,5 +1,6 @@
 ﻿Function Create-ADUser{
-
+##name should be in the following format: John Doe
+##UPN will be first letter of first name + last name, EG. JDoe
 [cmdletbinding()]
     param(
     [parameter(mandatory=$true)]
