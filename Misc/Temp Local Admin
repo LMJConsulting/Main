@@ -1,4 +1,4 @@
-## adds the specific user as an admin then launches an elevated command prompt as that user. 
+## adds the specified user as an admin then launches an elevated command prompt as that user. 
 ##After the command prompt is closed it removes them as an admin.
 
 net localgroup administrators /add domain\test
