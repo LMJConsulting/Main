@@ -1,0 +1,10 @@
+## adds the specific user as an admin then launches an elevated command prompt as that user. 
+##After the command prompt is closed it removes them as an admin.
+
+net localgroup administrators /add domain\test
+$cred=get-credential ##Enter the creds for the account you want to runas
+$app=start-process cmd -credential $cred -passthru
+do {$process=get-process $app.name
+    If (!$process) {net localgroup administrators /delete domain\test}
+
+   } Until (!$process)
