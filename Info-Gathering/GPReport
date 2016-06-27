@@ -1,0 +1,1 @@
+get-adcomputer -filter * | foreach {icm $_.name { gpresult /h "\\lmjsvrvmad\sshare\gpresults\$env:computername.html"}}
