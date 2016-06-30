@@ -1,1 +1,3 @@
-get-adcomputer -filter * | foreach {icm $_.name { gpresult /h "\\lmjsvrvmad\sshare\gpresults\$env:computername.html"}}
+$computers=get-adcomputer -filter * | select -expandproperty name 
+
+foreach ($computer in $computers) {icm $computer {cmd /c gpresult /h C:\%computername%.html}; copy-item -path "\\$computer\C$\$computer.html" -destination "\\server11\public\IT\GPResults"}
