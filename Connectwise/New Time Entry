@@ -1,0 +1,54 @@
+function New-CWTimeEntry
+{
+<# example: new-cwtimeentry -ticketid 23712 -timestart 2016-07-11T17:00:00Z -timeend 2016-07-11T17:15:00Z -company "250" -member "163"
+-notes test -summary test
+
+   param
+    (
+        [Parameter(Mandatory = $True)]
+        [Int]$TicketID,
+        [Parameter(Mandatory = $True)]
+        [string]$timestart,
+        [Parameter(Mandatory = $True)]
+        [string]$timeend,
+        [Parameter(Mandatory = $True)]
+        [string]$summary,
+        [Parameter(Mandatory = $True)]
+        [int]$company,
+        [Parameter(Mandatory = $True)]
+        [string]$notes,
+        [Parameter(Mandatory = $True)]
+        [int]$member
+    )
+    
+    [string]$BaseUri     = "https://api-na.myconnectwise.net/v4_6_Release/apis/3.0/time/entries"
+    [string]$Accept      = "application/vnd.connectwise.com+json; version=v2015_3"
+    [string]$ContentType = "application/json"
+    [string]$Authstring  = "lmj" + '+' + "7Kq21eykHzXLlvjR" + ':' + "CSiL9Px87m0iHIpk"
+    $encodedAuth         = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(($Authstring)));
+ 
+
+$Body= @"
+{
+    "Summary"        : "$Summary",
+    "chargeToType"   : "ServiceTicket",
+    "chargeToId"     : "$TicketID",
+    "timeStart"      : "$TimeStart",
+    "timeend"        : "$TimeEnd",
+    "notes"          : "$Notes",
+    "company"        : {"id": "$Company"},
+    "member"         : {"id": "$Member"},
+    "BillableOption" : "Billable"
+    
+}
+"@
+
+$Headers=@{
+'X-cw-overridessl' = "True"
+"Authorization"="Basic $encodedAuth"
+}
+
+    $JSONResponse = Invoke-RestMethod -URI $BaseURI -Headers $Headers -ContentType $ContentType -Method Post -Body $Body
+
+    Return $JSONResponse
+}
