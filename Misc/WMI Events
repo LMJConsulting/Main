@@ -1,0 +1,16 @@
+##Event Registration
+
+    $query="SELECT * FROM __InstanceCreationEvent WITHIN 30 WHERE TargetInstance ISA 'win32_process' and targetInstance.name = 'calc.exe'"
+    $filtername = "test2"
+    $consumername = "test3"
+    $WMIEvent = set-wmiinstance -class '__EventFilter' -namespace 'root\subscription' -arguments @{name=$filtername; eventnamespace='root\cimv2';querylanguage='WQL';query=$query} -erroraction stop
+
+    $WMIConsumer = set-wmiinstance -class commandlineeventconsumer -namespace "root\subscription" -arguments @{name=$consumername; executablepath= "C:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe"; commandlinetemplate= "C:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe -executionpolicy bypass -file C:\\test.ps1"}
+
+    set-wmiinstance -class __filtertoconsumerbinding -namespace "root\subscription" -arguments @{filter = $wmievent; consumer = $wmiconsumer}
+    
+##Remove Event
+    Get-WmiObject __EventFilter -namespace root\subscription -filter "name like 'test%'" | Remove-WmiObject
+    Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name like 'test%'" | Remove-WmiObject
+    $bindings=gwmi __filtertoconsumerbinding -namespace root\subscription
+    foreach ($B in $bindings) {if ($b.filter -like "*test*") {$B | remove-wmiobject}}
